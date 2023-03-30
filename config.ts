@@ -2,10 +2,10 @@ import dotenv from "dotenv"
 
 dotenv.config();
 
-interface configInterface {
+interface Iconfig {
     botToken: string,
 }
 
-const config: configInterface = { botToken: String(process.env.BOT_TOKEN) }
+const config: Iconfig = { botToken: String(process.env.BOT_TOKEN) }
 
 export default config;
