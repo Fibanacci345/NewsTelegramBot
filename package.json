@@ -1,0 +1,24 @@
+{
+  "name": "telegram-news-aggregator",
+  "version": "1.0.0",
+  "description": "TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://alexchous@dev.azure.com/alexchous/Telegram%20News%20Aggregator/_git/Telegram%20News%20Aggregator"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "mongoose": "^7.0.3",
+    "telegram-bot-api-ts": "^1.1.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
