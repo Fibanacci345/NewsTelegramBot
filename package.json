@@ -2,9 +2,10 @@
   "name": "telegram-news-aggregator",
   "version": "1.0.0",
   "description": "TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project.",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "start": "nodemon index.js"
+    "build": "tsc -p .",
+    "start": "nodemon index.ts"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.22",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.2",
+    "ts-node": "^10.9.1"
   }
 }
