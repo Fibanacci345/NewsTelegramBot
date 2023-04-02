@@ -1,7 +1,7 @@
 import config from "./config";
 
 import { Bot, InlineKeyboard } from "grammy";
-import { newsHandler } from "./handlers/users";
+import { newsCallbackHandler, newsHandler } from "./handlers/users";
 import { BotCommand, ParseMode } from "grammy/types";
 
 export const bot = new Bot(config.botToken);
@@ -14,5 +14,5 @@ export const commands: BotCommand[] = [
 
 export const parseMode: ParseMode = "HTML";
 
-bot.callbackQuery("next", (ctx) => { ctx.reply("test") });
+bot.callbackQuery(/next [0-9]*/, newsCallbackHandler);
 bot.command("news", newsHandler);
