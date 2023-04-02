@@ -8,7 +8,7 @@ interface IConfig {
     newsToken: string,
 }
 
-const config: IConfig = { 
+const config: IConfig = {
     botToken: String(process.env.BOT_TOKEN),
     databaseConnectionString: String(process.env.DB_CONNETION_STRING),    
     newsToken: String(process.env.NEWS_TOKEN),

@@ -2,10 +2,12 @@ import config from "./config";
 import { connect } from "mongoose";
 
 import { Bot } from "grammy";
-import { test } from "./handlers/users";
+import { newsHandler } from "./handlers/users";
 import { BotCommand } from "grammy/types";
 
 const bot = new Bot(config.botToken);
+
+
 
 const commands: BotCommand[] = [
     { command: "start", description: "Start the bot" },
@@ -15,7 +17,7 @@ const commands: BotCommand[] = [
 
 connect(config.databaseConnectionString);
 
-bot.on("message", test);
+bot.command("news", newsHandler);
 
 bot.start().then(() => {
     bot.api.setMyCommands(commands);
