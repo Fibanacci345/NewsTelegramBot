@@ -6,8 +6,7 @@ export interface IUserSettings {
 
 const userSettingsSchema = new Schema<IUserSettings>({
     country: {
-        type: String,
-        required: false
+        type: String
     }
 });
 
