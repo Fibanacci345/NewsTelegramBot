@@ -1,7 +1,12 @@
-import { Context } from "grammy";
+import { Context, InlineKeyboard } from "grammy";
 import News from "../utils/news";
+import { ParseMode } from "grammy/types";
 
-const parseMode: "HTML" | "Markdown" | "MarkdownV2" = "HTML";
+const parseMode: ParseMode = "HTML";
+
+const menu = new InlineKeyboard()
+    .text("next")
+    .text("down");
 
 export const newsHandler = async (ctx: Context): Promise<void> => {
     const result = await News.getTopHeadlinesFormatted({
@@ -9,6 +14,7 @@ export const newsHandler = async (ctx: Context): Promise<void> => {
     });
 
     ctx.reply(result[0], {
-        parse_mode: parseMode
+        parse_mode: parseMode,
+        reply_markup: menu,
     });
 }

@@ -15,6 +15,7 @@ export class News {
     }
 
     async getEverythingFormatted(params: INewsApiEverythingParams): Promise<string[]> {
+        4
         const response = await this.newsAPI.getEverything(params);
 
         let result = response.articles.map(e => {
