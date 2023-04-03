@@ -15,4 +15,5 @@ export const commands: BotCommand[] = [
 export const parseMode: ParseMode = "HTML";
 
 bot.callbackQuery(/next [0-9]*/, newsCallbackHandler);
+bot.callbackQuery(/back [0-9]*/, newsCallbackHandler);
 bot.command("news", newsHandler);
