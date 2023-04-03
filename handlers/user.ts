@@ -4,7 +4,9 @@ import { parseMode } from "../bot";
 
 import { Context } from "grammy";
 
-export const newsHandler = async (ctx: Context): Promise<void> => {
+const newsHandler = async () => { }
+
+const headlinesHandler = async (ctx: Context): Promise<void> => {
     try {
         const headlines: string[] = await News.getTopHeadlinesFormatted({
             country: "us",
@@ -23,7 +25,7 @@ export const newsHandler = async (ctx: Context): Promise<void> => {
     }
 }
 
-export const newsCallbackHandler = async (ctx: Context): Promise<void> => {
+const headlinesCallbackHandler = async (ctx: Context): Promise<void> => {
     try {
         const headlines: string[] = await News.getTopHeadlinesFormatted({
             country: "us",
@@ -52,3 +54,5 @@ export const newsCallbackHandler = async (ctx: Context): Promise<void> => {
         console.log(error);
     }
 }
+
+export default { newsHandler, headlinesHandler, headlinesCallbackHandler }
