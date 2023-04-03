@@ -3,8 +3,13 @@ import { getNewsNavMenu } from "../keyboards/inline";
 import { parseMode } from "../bot";
 
 import { Context } from "grammy";
+import { currentState, setState, stateParameters } from "../state";
 
-const newsHandler = async () => { }
+const newsHandler = (ctx: Context) => {
+    ctx.reply("Hello! Send me a topic.");
+
+    setState({ newsRegime: true });
+}
 
 const headlinesHandler = async (ctx: Context): Promise<void> => {
     try {
@@ -18,6 +23,8 @@ const headlinesHandler = async (ctx: Context): Promise<void> => {
             parse_mode: parseMode,
             reply_markup: getNewsNavMenu(headlines.length - 1, 1),
         });
+
+        setState({ headlinesRegime: true });
     } catch (error) {
         ctx.reply("Oops! Something went wrong.");
 
