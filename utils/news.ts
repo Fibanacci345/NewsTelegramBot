@@ -1,41 +1,41 @@
-import NewsAPI, { INewsApiResponse, INewsApiEverythingParams, INewsApiTopHeadlinesParams } from "ts-newsapi";
+import NewsAPI, { INewsApiResponse, INewsApiEverythingParams, INewsApiTopHeadlinesParams, INewsApiArticle } from "ts-newsapi";
 import config from "../config";
 
 export class News {
     private newsAPI = new NewsAPI(config.newsToken);
 
     async getEverythingDescription(params: INewsApiEverythingParams): Promise<string[]> {
-        const response = await this.newsAPI.getEverything(params);
+        const response: INewsApiResponse = await this.newsAPI.getEverything(params);
 
-        let result = response.articles.map(e => {
-            return e.description!;
-        })
+        const articles: string[] = response.articles.map((article: INewsApiArticle) => {
+            return article.description ? article.description : "There is no description";
+        });
 
-        return result;
+        return articles;
     }
 
     async getEverythingFormatted(params: INewsApiEverythingParams): Promise<string[]> {
-        4
-        const response = await this.newsAPI.getEverything(params);
+        const response: INewsApiResponse = await this.newsAPI.getEverything(params);
 
-        let result = response.articles.map(e => {
-            return `<b>${e.title}</b>\n\n` +
-                `${e.description}\n\n` +
-                `${e.author} - <a href="${e.url}">${e.source.name}</a>`;
-        })
-        return result;
+        const articles: string[] = response.articles.map((article: INewsApiArticle) => {
+            return `<b>${article.title}</b>\n\n` +
+                `${article.description}\n\n` +
+                `${article.author} - <a href="${article.url}">${article.source.name}</a>`;
+        });
+
+        return articles;
     }
 
     async getTopHeadlinesFormatted(params: INewsApiTopHeadlinesParams): Promise<string[]> {
-        const response = await this.newsAPI.getTopHeadlines(params);
+        const response: INewsApiResponse = await this.newsAPI.getTopHeadlines(params);
 
-        let result = response.articles.map(e => {
-            return `<b>${e.title}</b>\n\n` +
-                `${e.description}\n\n` +
-                `${e.author} - <a href="${e.url}">${e.source.name}</a>`;
+        const articles: string[] = response.articles.map((article: INewsApiArticle) => {
+            return `<b>${article.title}</b>\n\n` +
+                `${article.description}\n\n` +
+                `${article.author} - <a href="${article.url}">${article.source.name}</a>`;
         })
 
-        return result;
+        return articles;
     }
 }
 
