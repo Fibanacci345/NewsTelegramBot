@@ -1,6 +1,6 @@
 import News from "../utils/news";
-import { getNewsNavMenu } from "../keyboards/inline";
-import { parseMode } from "../bot";
+import { getHeadlinesNav } from "../keyboards/inline";
+import { bot, parseMode } from "../bot";
 
 import { Context } from "grammy";
 import { currentState, setState, stateParameters } from "../state";
@@ -9,6 +9,32 @@ const newsHandler = (ctx: Context) => {
     ctx.reply("Hello! Send me a topic.");
 
     setState({ newsRegime: true });
+}
+
+const newsMessageHandler = async (ctx: Context) => {
+    if (currentState.newsRegime) {
+        try {
+            if (typeof ctx.message === "undefined") throw new Error("Invalid message");
+
+            const articles: string[] = await News.getEverythingFormatted({ q: ctx.message.text })
+
+            if (articles.length === 0) {
+                ctx.reply("It seems like there is no news with such query. Try again.");
+
+                return null;
+            }
+
+            ctx.reply(articles[0], {
+                parse_mode: parseMode,
+            });
+        } catch (error) {
+            ctx.reply("Oops! Something went wrong.");
+
+            console.log(error);
+        }
+    } else {
+        ctx.reply("Please use /help command if you don't know what to do");
+    }
 }
 
 const headlinesHandler = async (ctx: Context): Promise<void> => {
@@ -21,7 +47,7 @@ const headlinesHandler = async (ctx: Context): Promise<void> => {
 
         ctx.reply(headlines[0], {
             parse_mode: parseMode,
-            reply_markup: getNewsNavMenu(headlines.length - 1, 1),
+            reply_markup: getHeadlinesNav(headlines.length - 1, 1),
         });
 
         setState({ headlinesRegime: true });
@@ -53,7 +79,7 @@ const headlinesCallbackHandler = async (ctx: Context): Promise<void> => {
 
         ctx.reply(headlines[currentIndex], {
             parse_mode: parseMode,
-            reply_markup: getNewsNavMenu(prevIndex, nextIndex)
+            reply_markup: getHeadlinesNav(prevIndex, nextIndex)
         });
     } catch (error) {
         ctx.reply("Oops! Something went wrong.");
@@ -62,4 +88,4 @@ const headlinesCallbackHandler = async (ctx: Context): Promise<void> => {
     }
 }
 
-export default { newsHandler, headlinesHandler, headlinesCallbackHandler }
+export default { newsHandler, newsMessageHandler, headlinesHandler, headlinesCallbackHandler }
