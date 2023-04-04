@@ -4,12 +4,14 @@ dotenv.config();
 
 interface IConfig {
     botToken: string,
-    databaseConnectionString: string
+    databaseConnectionString: string,
+    newsToken: string,
 }
 
-const config: IConfig = { 
+const config: IConfig = {
     botToken: String(process.env.BOT_TOKEN),
-    databaseConnectionString: String(process.env.DB_CONNETION_STRING) 
+    databaseConnectionString: String(process.env.DB_CONNETION_STRING),    
+    newsToken: String(process.env.NEWS_TOKEN),
 }
 
 export default config;
