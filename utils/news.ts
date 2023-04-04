@@ -7,8 +7,10 @@ export class News {
     async getEverythingDescription(params: INewsApiEverythingParams): Promise<string[]> {
         const response: INewsApiResponse = await this.newsAPI.getEverything(params);
 
-        const articles: string[] = response.articles.map((article: INewsApiArticle) => {
-            return article.description ? article.description : "There is no description";
+        const articles: string[] = [];
+
+        response.articles.forEach((article: INewsApiArticle) => {
+            if (article.description) articles.push(article.description);
         });
 
         return articles;
