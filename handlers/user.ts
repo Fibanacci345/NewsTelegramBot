@@ -1,9 +1,11 @@
 import News from "../utils/news";
 import { getHeadlinesNav } from "../keyboards/inline";
-import { bot, parseMode } from "../bot";
+import { bot, commands, parseMode } from "../bot";
 
 import { Context } from "grammy";
 import { currentState, setState, stateParameters } from "../state";
+
+
 
 const newsHandler = (ctx: Context) => {
     ctx.reply("Hello! Send me a topic.");

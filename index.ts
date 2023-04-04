@@ -4,6 +4,12 @@ import { bot, commands } from "./bot";
 
 connect(config.databaseConnectionString);
 
-bot.start().then(() => {
-    bot.api.setMyCommands(commands)
-});
+const startBot = async () => {
+    console.log("Started");
+    await bot.start();
+
+    bot.api.deleteMyCommands();
+    bot.api.setMyCommands(commands);
+}
+
+startBot();
