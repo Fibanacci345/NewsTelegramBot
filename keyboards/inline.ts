@@ -1,7 +1,7 @@
 import { InlineKeyboard } from "grammy";
 
-export const getNewsNavMenu = (prevId: number, nextId: number): InlineKeyboard => {
+export const getHeadlinesNav = (prevId: number, nextId: number): InlineKeyboard => {
     return new InlineKeyboard()
-        .text("next", `next ${nextId}`)
-        .text("back", `back ${prevId}`);
+        .text("next", `nextHeadlines ${nextId}`)
+        .text("back", `backHeadlines ${prevId}`);
 }
