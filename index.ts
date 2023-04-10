@@ -8,3 +8,5 @@ bot.command("start", (ctx) => ctx.reply("Welcome! Up and running."));
 bot.on("message", (ctx) => ctx.reply("Nice"));
 
 connect(config.databaseConnectionString);
+
+bot.start();
