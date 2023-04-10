@@ -4,7 +4,7 @@ dotenv.config();
 
 interface IConfig {
     botToken: string,
-    databaseConnectionString: string
+    databaseConnectionString: string,
     newsToken: string,
 }
 
