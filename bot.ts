@@ -11,10 +11,11 @@ export const commands: BotCommand[] = [
     { command: "headlines", description: "Sending headlines" },
 ]
 
-export const parseMode: ParseMode = "HTML";
+bot.callbackQuery(/moveHeadlines [0-9]* [f,b]/, handlers.user.headlinesCallbackHandler);
+// bot.callbackQuery(/moveNews [0-9]* [f,b]/, handlers.user.newsCallbackHandler);
 
-bot.callbackQuery(/nextHeadlines [0-9]*/, handlers.user.headlinesCallbackHandler);
-bot.callbackQuery(/backHeadlines [0-9]*/, handlers.user.headlinesHandler);
 bot.command("headlines", handlers.user.headlinesHandler);
 bot.command("news", handlers.user.newsHandler);
-bot.on("message", handlers.user.newsMessageHandler)
+bot.on("message", handlers.user.newsMessageHandler);
+
+export const parseMode: ParseMode = "HTML";

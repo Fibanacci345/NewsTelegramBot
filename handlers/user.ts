@@ -1,15 +1,36 @@
 import News from "../utils/news";
-import { getHeadlinesNav } from "../keyboards/inline";
+import { getNewsNav, getHeadlinesNav, MovingDirection } from "../keyboards/inline";
 import { bot, commands, parseMode } from "../bot";
 
 import { Context } from "grammy";
 import { currentState, setState, stateParameters } from "../state";
 
+interface IMovingButtonCallback {
+    current: number,
+    direction: string
+}
 
+const parseMovingButtonCallback = (callback: string): IMovingButtonCallback => {
+    let params: string[]
+    let current: number;
+    let direction: string;
+
+    try {
+        params = callback.split(" ");
+        current = parseInt(params[1]);
+        direction = params[2];
+    } catch (err) {
+        throw new Error("Can't parse callback");
+    }
+    return {
+        current: current,
+        direction: direction
+    }
+}
 
 const newsHandler = (ctx: Context) => {
     ctx.reply("Hello! Send me a topic.");
-
+    console.log("asd");
     setState({ newsRegime: true });
 }
 
@@ -49,7 +70,7 @@ const headlinesHandler = async (ctx: Context): Promise<void> => {
 
         ctx.reply(headlines[0], {
             parse_mode: parseMode,
-            reply_markup: getHeadlinesNav(headlines.length - 1, 1),
+            reply_markup: getHeadlinesNav(0),
         });
 
         setState({ headlinesRegime: true });
@@ -61,33 +82,24 @@ const headlinesHandler = async (ctx: Context): Promise<void> => {
 }
 
 const headlinesCallbackHandler = async (ctx: Context): Promise<void> => {
-    try {
-        const headlines: string[] = await News.getTopHeadlinesFormatted({
-            country: "us",
-        });
+    const movingButtonCallback = parseMovingButtonCallback(ctx.callbackQuery?.data!);
 
-        if (headlines.length === 0) throw new Error("There is no headlines");
+    const headlines: string[] = await News.getTopHeadlinesFormatted({
+        country: "us",
+    });
 
-        if (typeof ctx.callbackQuery === "undefined" || typeof ctx.callbackQuery.data === "undefined") {
-            throw new Error("Can't get current index");
-        }
+    if (headlines.length === 0) throw new Error("There is no headlines");
 
-        const currentIndex: number = parseInt(ctx.callbackQuery.data.split(" ")[1]);
-        let nextIndex: number = currentIndex + 1;
-        let prevIndex: number = currentIndex - 1;
+    let movingIndex = movingButtonCallback.direction == 'f'
+        ? movingButtonCallback.current + 1
+        : movingButtonCallback.current - 1
 
-        if (nextIndex >= headlines.length) nextIndex = 0;
-        if (prevIndex <= -1) prevIndex = headlines.length - 1;
+    if (movingIndex >= headlines.length) movingIndex = 0;
+    else if (movingIndex == -1) movingIndex = headlines.length - 1;
 
-        ctx.reply(headlines[currentIndex], {
-            parse_mode: parseMode,
-            reply_markup: getHeadlinesNav(prevIndex, nextIndex)
-        });
-    } catch (error) {
-        ctx.reply("Oops! Something went wrong.");
-
-        console.log(error);
-    }
+    ctx.reply(headlines[movingIndex], {
+        parse_mode: parseMode,
+        reply_markup: getHeadlinesNav(movingIndex)
+    })
 }
-
 export default { newsHandler, newsMessageHandler, headlinesHandler, headlinesCallbackHandler }
