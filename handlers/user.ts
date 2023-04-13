@@ -5,9 +5,20 @@ import { bot, commands, parseMode } from "../bot";
 import { Context } from "grammy";
 import { currentState, setState, stateParameters } from "../state";
 
+enum CallbackParamsIndexes {
+    commandTitle = 0,
+    currentIndex,
+    direction,
+    query
+}
+
 interface IMovingButtonCallback {
     current: number,
     direction: string
+}
+
+interface INewsMovingButtonCallback extends IMovingButtonCallback {
+    query: string,
 }
 
 const parseMovingButtonCallback = (callback: string): IMovingButtonCallback => {
@@ -17,8 +28,8 @@ const parseMovingButtonCallback = (callback: string): IMovingButtonCallback => {
 
     try {
         params = callback.split(" ");
-        current = parseInt(params[1]);
-        direction = params[2];
+        current = parseInt(params[CallbackParamsIndexes.currentIndex]);
+        direction = params[CallbackParamsIndexes.direction];
     } catch (err) {
         throw new Error("Can't parse callback");
     }
@@ -28,9 +39,22 @@ const parseMovingButtonCallback = (callback: string): IMovingButtonCallback => {
     }
 }
 
+const parseNewsMovingButtonCallback = (callback: string): INewsMovingButtonCallback => {
+    const baseParams: IMovingButtonCallback = parseMovingButtonCallback(callback);
+
+    const query = callback.split(" ")[CallbackParamsIndexes.query];
+
+    const fullParams = {
+        ...baseParams,
+        query,
+    }
+
+    return fullParams;
+}
+
 const newsHandler = (ctx: Context) => {
     ctx.reply("Hello! Send me a topic.");
-    console.log("asd");
+
     setState({ newsRegime: true });
 }
 
@@ -39,7 +63,11 @@ const newsMessageHandler = async (ctx: Context) => {
         try {
             if (typeof ctx.message === "undefined") throw new Error("Invalid message");
 
-            const articles: string[] = await News.getEverythingFormatted({ q: ctx.message.text })
+            const query = ctx.message.text;
+
+            if (typeof query === "undefined") throw new Error("Invalid message");
+
+            const articles: string[] = await News.getEverythingFormatted({ q: query })
 
             if (articles.length === 0) {
                 ctx.reply("It seems like there is no news with such query. Try again.");
@@ -49,6 +77,7 @@ const newsMessageHandler = async (ctx: Context) => {
 
             ctx.reply(articles[0], {
                 parse_mode: parseMode,
+                reply_markup: getNewsNav(0, articles.length, query)
             });
         } catch (error) {
             ctx.reply("Oops! Something went wrong.");
@@ -58,6 +87,26 @@ const newsMessageHandler = async (ctx: Context) => {
     } else {
         ctx.reply("Please use /help command if you don't know what to do");
     }
+}
+
+const newsCallbackHandler = async (ctx: Context): Promise<void> => {
+    const movingButtonCallback: INewsMovingButtonCallback = parseNewsMovingButtonCallback(ctx.callbackQuery?.data!);
+    console.log(movingButtonCallback);
+    const articles: string[] = await News.getEverythingFormatted({ q: movingButtonCallback.query })
+
+    if (articles.length === 0) throw new Error("There is no news for this query.");
+
+    let movingIndex = movingButtonCallback.direction == 'f'
+        ? movingButtonCallback.current + 1
+        : movingButtonCallback.current - 1
+
+    if (movingIndex >= articles.length) movingIndex = 0;
+    else if (movingIndex == -1) movingIndex = articles.length - 1;
+
+    ctx.reply(articles[movingIndex], {
+        parse_mode: parseMode,
+        reply_markup: getNewsNav(movingIndex, articles.length, movingButtonCallback.query)
+    })
 }
 
 const headlinesHandler = async (ctx: Context): Promise<void> => {
@@ -70,7 +119,7 @@ const headlinesHandler = async (ctx: Context): Promise<void> => {
 
         ctx.reply(headlines[0], {
             parse_mode: parseMode,
-            reply_markup: getHeadlinesNav(0),
+            reply_markup: getHeadlinesNav(0, headlines.length),
         });
 
         setState({ headlinesRegime: true });
@@ -99,7 +148,7 @@ const headlinesCallbackHandler = async (ctx: Context): Promise<void> => {
 
     ctx.reply(headlines[movingIndex], {
         parse_mode: parseMode,
-        reply_markup: getHeadlinesNav(movingIndex)
+        reply_markup: getHeadlinesNav(movingIndex, headlines.length)
     })
 }
-export default { newsHandler, newsMessageHandler, headlinesHandler, headlinesCallbackHandler }
+export default { newsHandler, newsMessageHandler, newsCallbackHandler, headlinesHandler, headlinesCallbackHandler }
