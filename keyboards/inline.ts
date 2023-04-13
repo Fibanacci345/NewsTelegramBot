@@ -5,15 +5,16 @@ export enum MovingDirection {
     Backward = 'b'
 }
 
-export const getHeadlinesNav = (currentIndex: number): InlineKeyboard => {
+export const getHeadlinesNav = (currentIndex: number, size: number): InlineKeyboard => {
     return new InlineKeyboard()
         .text("next", `moveHeadlines ${currentIndex} f`)
-        .text(`${currentIndex + 1}`)
+        .text(`${currentIndex + 1} - ${size}`)
         .text("back", `moveHeadlines ${currentIndex} b`);
 }
 
-export const getNewsNav = (currentIndex: number): InlineKeyboard => {
+export const getNewsNav = (currentIndex: number, size: number, query: string): InlineKeyboard => {
     return new InlineKeyboard()
-        .text("next", `moveNews ${currentIndex} f`)
-        .text("back", `moveNews ${currentIndex} b`);
+        .text("next", `moveNews ${currentIndex} f ${query}`)
+        .text(`${currentIndex + 1} - ${size}`)
+        .text("back", `moveNews ${currentIndex} b ${query}`);
 }
