@@ -11,7 +11,7 @@ export const getHeadlinesNav = (currentIndex: number, size: number): InlineKeybo
 
 export const getNewsNav = (currentIndex: number, size: number, query: string): InlineKeyboard => {
     return new InlineKeyboard()
-        .text("next", `moveNews ${currentIndex} f ${query}`)
+        .text("back", `moveNews ${currentIndex} b ${query}`)
         .text(`${currentIndex + 1} - ${size}`)
-        .text("back", `moveNews ${currentIndex} b ${query}`);
+        .text("next", `moveNews ${currentIndex} f ${query}`);
 }

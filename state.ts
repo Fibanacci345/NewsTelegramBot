@@ -14,5 +14,4 @@ export let currentState: IState = initState
 
 export const setState = (newState: stateParameters) => {
     currentState = { ...initState, ...newState } as IState;
-    console.log(currentState);
 }
