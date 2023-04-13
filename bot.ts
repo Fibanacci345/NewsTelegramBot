@@ -1,19 +1,21 @@
 import config from "./config";
 
-import { Bot, InlineKeyboard } from "grammy";
-import { newsCallbackHandler, newsHandler } from "./handlers/users";
+import handlers from "./handlers";
+import { Bot } from "grammy";
 import { BotCommand, ParseMode } from "grammy/types";
 
 export const bot = new Bot(config.botToken);
 
 export const commands: BotCommand[] = [
-    { command: "start", description: "Start the bot" },
-    { command: "help", description: "Show help text" },
-    { command: "news", description: "Sending news" },
+    { command: "news", description: "Sending news by query" },
+    { command: "headlines", description: "Sending headlines" },
 ]
 
-export const parseMode: ParseMode = "HTML";
+bot.callbackQuery(/moveHeadlines [0-9]* [f,b]/, handlers.user.headlinesCallbackHandler);
+bot.callbackQuery(/moveNews [0-9]* [f,b] [\w]*/, handlers.user.newsCallbackHandler);
 
-bot.callbackQuery(/next [0-9]*/, newsCallbackHandler);
-bot.callbackQuery(/back [0-9]*/, newsCallbackHandler);
-bot.command("news", newsHandler);
+bot.command("headlines", handlers.user.headlinesHandler);
+bot.command("news", handlers.user.newsHandler);
+bot.on("message", handlers.user.newsMessageHandler);
+
+export const parseMode: ParseMode = "HTML";
