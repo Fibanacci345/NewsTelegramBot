@@ -1,9 +1,6 @@
 import { InlineKeyboard } from "grammy";
 
-export enum MovingDirection {
-    Forward = 'f',
-    Backward = 'b'
-}
+export type movingDirection = "f" | "d";
 
 export const getHeadlinesNav = (currentIndex: number, size: number): InlineKeyboard => {
     return new InlineKeyboard()
