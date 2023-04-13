@@ -12,7 +12,7 @@ export const commands: BotCommand[] = [
 ]
 
 bot.callbackQuery(/moveHeadlines [0-9]* [f,b]/, handlers.user.headlinesCallbackHandler);
-// bot.callbackQuery(/moveNews [0-9]* [f,b]/, handlers.user.newsCallbackHandler);
+bot.callbackQuery(/moveNews [0-9]* [f,b] [A-z]*/, handlers.user.newsCallbackHandler);
 
 bot.command("headlines", handlers.user.headlinesHandler);
 bot.command("news", handlers.user.newsHandler);
