@@ -38,9 +38,6 @@ const newsMessageHandler = async (ctx: Context): Promise<void> => {
             });
 
             setBotLastMessage(botMessage.message_id);
-
-
-
         } catch (err) {
             ctx.reply("Oops! Something went wrong.");
 
@@ -99,11 +96,12 @@ const headlinesHandler = async (ctx: Context): Promise<void> => {
             return;
         }
 
-        ctx.reply(headlines[0], {
+        const botMessage = await ctx.reply(headlines[0], {
             parse_mode: parseMode,
             reply_markup: getHeadlinesNav(0, headlines.length),
         });
 
+        setBotLastMessage(botMessage.message_id);
         setHeadlinesRegime();
     } catch (error) {
         ctx.reply("Oops! Something went wrong.");
@@ -125,12 +123,21 @@ const headlinesCallbackHandler = async (ctx: Context): Promise<void> => {
         return;
     }
 
-    const movingIndex: number = helpers.getValidatedIndex(movingButtonCallback.current, movingButtonCallback.direction, headlines.length);
+    if (typeof ctx.chat === "undefined") throw new Error("ctx.chat is undefined");
+    if (typeof currentState.botLastMessageId === "undefined") {
+        ctx.reply("Something went wrong! Please make a new query request.");
 
-    ctx.reply(headlines[movingIndex], {
+        return;
+    }
+
+    const movingIndex: number = helpers.getValidatedIndex(movingButtonCallback.current, movingButtonCallback.direction, headlines.length);
+    const botLastMessageId: number = currentState.botLastMessageId;
+    const chatId: number = ctx.chat.id;
+
+    await bot.api.editMessageText(chatId, botLastMessageId, headlines[movingIndex], {
         parse_mode: parseMode,
         reply_markup: getHeadlinesNav(movingIndex, headlines.length)
-    })
+    });
 }
 
 export default { newsHandler, newsMessageHandler, newsCallbackHandler, headlinesHandler, headlinesCallbackHandler }
