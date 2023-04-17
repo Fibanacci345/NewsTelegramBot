@@ -3,8 +3,12 @@ import config from "./config";
 import handlers from "./handlers";
 import { Bot } from "grammy";
 import { BotCommand, ParseMode } from "grammy/types";
+import { apiThrottler } from "@grammyjs/transformer-throttler";
 
 export const bot = new Bot(config.botToken);
+
+const throttler = apiThrottler();
+bot.api.config.use(throttler);
 
 export const parseMode: ParseMode = "HTML";
 

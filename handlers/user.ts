@@ -72,11 +72,21 @@ const newsCallbackHandler = async (ctx: Context): Promise<void> => {
         const movingIndex: number = helpers.getValidatedIndex(movingButtonCallback.current, movingButtonCallback.direction, articles.length);
         const botLastMessageId: number = currentState.botLastMessageId;
         const chatId: number = ctx.chat.id;
+        try {
+            await bot.api.editMessageText(chatId, botLastMessageId, articles[movingIndex], {
+                parse_mode: parseMode,
+                reply_markup: getNewsNav(movingIndex, articles.length, movingButtonCallback.query),
+                disable_web_page_preview: true
+            });
+        }
+        catch (err: any) {
+            if (err.error_code != 400){
+                throw err;
+            } 
+        }
 
-        await bot.api.editMessageText(chatId, botLastMessageId, articles[movingIndex], {
-            parse_mode: parseMode,
-            reply_markup: getNewsNav(movingIndex, articles.length, movingButtonCallback.query)
-        });
+        ctx.answerCallbackQuery();
+
     } catch (err) {
         ctx.reply("Oops! Something went wrong.");
 
