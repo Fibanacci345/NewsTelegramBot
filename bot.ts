@@ -3,8 +3,14 @@ import config from "./config";
 import handlers from "./handlers";
 import { Bot } from "grammy";
 import { BotCommand, ParseMode } from "grammy/types";
+import { apiThrottler } from "@grammyjs/transformer-throttler";
 
 export const bot = new Bot(config.botToken);
+
+const throttler = apiThrottler();
+bot.api.config.use(throttler);
+
+export const parseMode: ParseMode = "HTML";
 
 export const commands: BotCommand[] = [
     { command: "news", description: "Sending news by query" },
@@ -18,4 +24,3 @@ bot.command("headlines", handlers.user.headlinesHandler);
 bot.command("news", handlers.user.newsHandler);
 bot.on("message", handlers.user.newsMessageHandler);
 
-export const parseMode: ParseMode = "HTML";

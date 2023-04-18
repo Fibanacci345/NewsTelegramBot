@@ -1,16 +1,17 @@
 import News from "../utils/news";
 import { getNewsNav, getHeadlinesNav } from "../keyboards/inline";
-import { parseMode } from "../bot";
+import { bot, parseMode } from "../bot";
 
 import { Context } from "grammy";
-import { currentState, setState } from "../state";
+import { currentState } from "../state";
+import { setNewsRegime, setHeadlinesRegime, setBotLastMessage } from "../state/reducers";
 
-import helpers, { CallbackParamsIndexes, IMovingButtonCallback, INewsMovingButtonCallback } from "../common/handlerHelpers";
+import helpers, { IMovingButtonCallback, INewsMovingButtonCallback } from "../common/handlerHelpers";
 
 const newsHandler = (ctx: Context) => {
     ctx.reply("Hello! Send me a topic.");
 
-    setState({ newsRegime: true });
+    setNewsRegime();
 }
 
 const newsMessageHandler = async (ctx: Context): Promise<void> => {
@@ -31,10 +32,12 @@ const newsMessageHandler = async (ctx: Context): Promise<void> => {
                 return;
             }
 
-            ctx.reply(articles[0], {
+            const botMessage = await ctx.reply(articles[0], {
                 parse_mode: parseMode,
                 reply_markup: getNewsNav(0, articles.length, query)
             });
+
+            setBotLastMessage(botMessage.message_id);
         } catch (err) {
             ctx.reply("Oops! Something went wrong.");
 
@@ -59,12 +62,31 @@ const newsCallbackHandler = async (ctx: Context): Promise<void> => {
             return;
         }
 
-        let movingIndex = helpers.getValidatedIndex(movingButtonCallback.current, movingButtonCallback.direction, articles.length);
+        if (typeof ctx.chat === "undefined") throw new Error("ctx.chat is undefined");
+        if (typeof currentState.botLastMessageId === "undefined") {
+            ctx.reply("Something went wrong! Please make a new query request.");
 
-        ctx.reply(articles[movingIndex], {
-            parse_mode: parseMode,
-            reply_markup: getNewsNav(movingIndex, articles.length, movingButtonCallback.query)
-        })
+            return;
+        }
+
+        const movingIndex: number = helpers.getValidatedIndex(movingButtonCallback.current, movingButtonCallback.direction, articles.length);
+        const botLastMessageId: number = currentState.botLastMessageId;
+        const chatId: number = ctx.chat.id;
+        try {
+            await bot.api.editMessageText(chatId, botLastMessageId, articles[movingIndex], {
+                parse_mode: parseMode,
+                reply_markup: getNewsNav(movingIndex, articles.length, movingButtonCallback.query),
+                disable_web_page_preview: true
+            });
+        }
+        catch (err: any) {
+            if (err.error_code != 400){
+                throw err;
+            } 
+        }
+
+        ctx.answerCallbackQuery();
+
     } catch (err) {
         ctx.reply("Oops! Something went wrong.");
 
@@ -84,12 +106,13 @@ const headlinesHandler = async (ctx: Context): Promise<void> => {
             return;
         }
 
-        ctx.reply(headlines[0], {
+        const botMessage = await ctx.reply(headlines[0], {
             parse_mode: parseMode,
             reply_markup: getHeadlinesNav(0, headlines.length),
         });
 
-        setState({ headlinesRegime: true });
+        setBotLastMessage(botMessage.message_id);
+        setHeadlinesRegime();
     } catch (error) {
         ctx.reply("Oops! Something went wrong.");
 
@@ -98,7 +121,7 @@ const headlinesHandler = async (ctx: Context): Promise<void> => {
 }
 
 const headlinesCallbackHandler = async (ctx: Context): Promise<void> => {
-    const movingButtonCallback = helpers.parseMovingButtonCallback(ctx.callbackQuery?.data!);
+    const movingButtonCallback: IMovingButtonCallback = helpers.parseMovingButtonCallback(ctx.callbackQuery?.data!);
 
     const headlines: string[] = await News.getTopHeadlinesFormatted({
         country: "us",
@@ -110,12 +133,21 @@ const headlinesCallbackHandler = async (ctx: Context): Promise<void> => {
         return;
     }
 
-    let movingIndex = helpers.getValidatedIndex(movingButtonCallback.current, movingButtonCallback.direction, headlines.length);
+    if (typeof ctx.chat === "undefined") throw new Error("ctx.chat is undefined");
+    if (typeof currentState.botLastMessageId === "undefined") {
+        ctx.reply("Something went wrong! Please make a new query request.");
 
-    ctx.reply(headlines[movingIndex], {
+        return;
+    }
+
+    const movingIndex: number = helpers.getValidatedIndex(movingButtonCallback.current, movingButtonCallback.direction, headlines.length);
+    const botLastMessageId: number = currentState.botLastMessageId;
+    const chatId: number = ctx.chat.id;
+
+    await bot.api.editMessageText(chatId, botLastMessageId, headlines[movingIndex], {
         parse_mode: parseMode,
         reply_markup: getHeadlinesNav(movingIndex, headlines.length)
-    })
+    });
 }
 
 export default { newsHandler, newsMessageHandler, newsCallbackHandler, headlinesHandler, headlinesCallbackHandler }
